@@ -9,27 +9,21 @@ on:
         type: choice
         options: ["27", "26", "195"]
 
-jobs:
-  detect-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      rabbitmq: ${{ steps.filter.outputs.rabbitmq }}
-      redis: ${{ steps.filter.outputs.redis }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            rabbitmq:
-              - 'infra/rabbitmq/**'
-            
-            redis:
-              - 'infra/redis/**'
+      deploy_redis:
+        description: "Redis 배포 여부"
+        required: true
+        type: boolean
+        default: false
 
+      deploy_rabbitmq:
+        description: "RabbitMQ 배포 여부"
+        required: true
+        type: boolean
+        default: false
+
+jobs:
   deploy-rabbitmq:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.rabbitmq == 'true'
+    if: ${{ github.event.inputs.deploy_rabbitmq == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -87,8 +81,7 @@ jobs:
               '
 
   deploy-redis:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.redis == 'true'
+    if: ${{ github.event.inputs.deploy_redis == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
