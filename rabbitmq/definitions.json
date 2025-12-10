@@ -1,0 +1,14 @@
+{
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "user-queues-auto-expire",
+      "pattern": "^translations-user.*",
+      "apply-to": "queues",
+      "definition": {
+        "expires": 2300000
+      },
+      "priority": 0
+    }
+  ]
+}
