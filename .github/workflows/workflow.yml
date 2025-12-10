@@ -67,16 +67,19 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key -p "${{ steps.port.outputs.port }}" \
             "${{ steps.user.outputs.user }}@${{ steps.host.outputs.host }}" '
               set -e
-
+          
+              INFRA_DIR="${{ vars.INFRA_BASE_PATH }}"
+              echo "[INFO] Using INFRA_DIR: $INFRA_DIR"
+          
               echo "[DEPLOY] Update infra repo"
-              if [ ! -d "/opt/business_meeting/infra/.git" ]; then
-                git clone https://github.com/YOUR_ORG/YOUR_INFRA_REPO.git /opt/business_meeting/infra
+              if [ ! -d "$INFRA_DIR/.git" ]; then
+                git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "$INFRA_DIR"
               else
-                git -C /opt/business_meeting/infra pull origin main
+                cd "$INFRA_DIR" && git pull origin main
               fi
 
               echo "[DEPLOY] Apply RabbitMQ compose"
-              cd /opt/business_meeting/infra/rabbitmq
+              cd "$INFRA_DIR"/rabbitmq
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
@@ -124,15 +127,18 @@ jobs:
             "${{ steps.user.outputs.user }}@${{ steps.host.outputs.host }}" '
               set -e
 
+              INFRA_DIR="${{ vars.INFRA_BASE_PATH }}"
+              echo "[INFO] Using INFRA_DIR: $INFRA_DIR"
+
               echo "[DEPLOY] Update infra repo"
-              if [ ! -d "/opt/business_meeting/infra/.git" ]; then
-                git clone https://github.com/YOUR_ORG/YOUR_INFRA_REPO.git /opt/business_meeting/infra
+              if [ ! -d "$INFRA_DIR/.git" ]; then
+                git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "$INFRA_DIR"
               else
-                git -C /opt/business_meeting/infra pull origin main
+                cd "$INFRA_DIR" && git pull origin main
               fi
 
               echo "[DEPLOY] Apply Redis compose"
-              cd /opt/business_meeting/infra/redis
+              cd "$INFRA_DIR"/redis
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
