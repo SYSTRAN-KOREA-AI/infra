@@ -79,7 +79,7 @@ jobs:
 
               echo "[DEPLOY] Apply RabbitMQ compose"
               cd rabbitmq
-              docker compose --env-file ../.env.$PROFILE up -d --build
+              "docker compose --env-file ../.env.'$PROFILE' up -d --build"
 
               echo "[CLEANUP] remove unused images"
               docker image prune -f || true
@@ -134,7 +134,7 @@ jobs:
 
               echo "[DEPLOY] Apply Redis compose"
               cd redis
-              docker compose --env-file ../.env.$PROFILE up -d --build
+              "docker compose --env-file ../.env.'$PROFILE' up -d --build"
 
               echo "[CLEANUP] remove unused images"
               docker image prune -f || true
