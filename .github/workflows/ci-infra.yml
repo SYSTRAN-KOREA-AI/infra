@@ -58,12 +58,13 @@ jobs:
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
               fi
           
+              cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
               git fetch origin main
               git reset --hard origin/main 
               git clean -fd
 
               echo "[DEPLOY] Apply RabbitMQ compose"
-              cd "'$INFRA'/rabbitmq"
+              cd rabbitmq
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
@@ -98,12 +99,13 @@ jobs:
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
               fi
           
+              cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
               git fetch origin main
               git reset --hard origin/main 
               git clean -fd
 
               echo "[DEPLOY] Apply Redis compose"
-              cd "'$INFRA'/redis"
+              cd redis
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
