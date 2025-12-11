@@ -6,7 +6,7 @@
       "pattern": "^translations-user.*",
       "apply-to": "queues",
       "definition": {
-        "expires": 3600000
+        "expires": 3600001
       },
       "priority": 0
     },
