@@ -9,17 +9,6 @@
         "expires": 3600001
       },
       "priority": 0
-    },
-    {
-      "vhost": "/",
-      "name": "bm-quorum-queues",
-      "pattern": "^bm\\.",
-      "apply-to": "queues",
-      "definition": {
-        "x-queue-type": "quorum",
-        "x-delivery-limit": 3
-      },
-      "priority": 10
     }
   ]
 }
