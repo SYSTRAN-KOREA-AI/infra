@@ -110,7 +110,7 @@ jobs:
               fi
           
               echo "[DEPLOY] Apply Redis compose"
-              cd '$INFRA/rabbitmq'
+              cd '$INFRA/redis'
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
