@@ -56,9 +56,11 @@ jobs:
               echo "[DEPLOY] Update infra repo"
               if [ ! -d "'$INFRA'/.git" ]; then
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
-              else
-                cd "'$INFRA'" && git pull origin main
               fi
+          
+              git fetch origin main
+              git reset --hard origin/main 
+              git clean -fd
 
               echo "[DEPLOY] Apply RabbitMQ compose"
               cd "'$INFRA'/rabbitmq"
@@ -92,12 +94,13 @@ jobs:
           
               echo "[INFO] INFRA_DIR='$INFRA'"
           
-              echo "[DEPLOY] Update infra repo"
               if [ ! -d "'$INFRA'/.git" ]; then
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
-              else
-                cd "'$INFRA'" && git pull origin main
               fi
+          
+              git fetch origin main
+              git reset --hard origin/main 
+              git clean -fd
 
               echo "[DEPLOY] Apply Redis compose"
               cd "'$INFRA'/redis"
