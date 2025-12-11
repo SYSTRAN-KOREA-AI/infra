@@ -70,7 +70,7 @@ jobs:
               fi
               
               echo "[DEPLOY] Creating .env"
-              printf "%s" "$ENV" > rabbitmq/.env
+              echo "'$ENV'" | sed 's/\r$//' > rabbitmq/.env
 
               echo "[DEPLOY] Apply RabbitMQ compose"
               cd rabbitmq
