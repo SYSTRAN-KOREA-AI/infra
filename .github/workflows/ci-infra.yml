@@ -55,6 +55,7 @@ jobs:
           
               echo "[DEPLOY] Update infra repo"
               if [ ! -d "'$INFRA'/.git" ]; then
+                rm -rf '$INFRA'
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
               fi
           
@@ -96,6 +97,7 @@ jobs:
               echo "[INFO] INFRA_DIR='$INFRA'"
           
               if [ ! -d "'$INFRA'/.git" ]; then
+                rm -rf '$INFRA'
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
               fi
           

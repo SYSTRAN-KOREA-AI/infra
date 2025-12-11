@@ -6,9 +6,20 @@
       "pattern": "^translations-user.*",
       "apply-to": "queues",
       "definition": {
-        "expires": 2300000
+        "expires": 3600000
       },
       "priority": 0
+    },
+    {
+      "vhost": "/",
+      "name": "bm-quorum-queues",
+      "pattern": "^bm\\.",
+      "apply-to": "queues",
+      "definition": {
+        "x-queue-type": "quorum",
+        "x-delivery-limit": 3
+      },
+      "priority": 10
     }
   ]
 }
