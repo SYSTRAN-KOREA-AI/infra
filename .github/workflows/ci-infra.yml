@@ -62,7 +62,7 @@ jobs:
               if [ ! -d "'$INFRA'/.git" ]; then
                 rm -rf '$INFRA'
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
-                echo "[DEPLOY] Sync infra repo with origin/main using robust fetch/reset"
+                cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
               else
                 echo "[DEPLOY] Sync infra repo with origin/main using robust fetch/reset"
                 cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
