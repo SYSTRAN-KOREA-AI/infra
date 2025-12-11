@@ -22,16 +22,15 @@ on:
         default: false
 
 env:
-  env:
-    SERVER_HOST: ${{ (github.event.inputs.server == '195' && secrets.SERVER_195_HOST) || (github.event.inputs.server == '26' && secrets.SERVER_26_HOST) || secrets.SERVER_27_HOST }}
-    SERVER_PORT: ${{ (github.event.inputs.server == '195' && secrets.SERVER_195_PORT) || (github.event.inputs.server == '26' && secrets.SERVER_26_PORT) || secrets.SERVER_27_PORT }}
-    SERVER_USER: ${{ (github.event.inputs.server == '195' && secrets.SERVER_195_USER) || (github.event.inputs.server == '26' && secrets.SERVER_26_USER) || secrets.SERVER_27_USER }}
-    BASE64_KEY: ${{ (github.event.inputs.server == '195' && secrets.SERVER_195_KEY) || (github.event.inputs.server == '26' && secrets.SERVER_26_KEY) || secrets.SERVER_27_KEY }}
-    INFRA_DIR: ${{ vars.INFRA_BASE_PATH }}
+  SERVER_HOST: ${{ (inputs.server == '195' && secrets.SERVER_195_HOST) || (inputs.server == '26' && secrets.SERVER_26_HOST) || secrets.SERVER_27_HOST }}
+  SERVER_PORT: ${{ (inputs.server == '195' && secrets.SERVER_195_PORT) || (inputs.server == '26' && secrets.SERVER_26_PORT) || secrets.SERVER_27_PORT }}
+  SERVER_USER: ${{ (inputs.server == '195' && secrets.SERVER_195_USER) || (inputs.server == '26' && secrets.SERVER_26_USER) || secrets.SERVER_27_USER }}
+  BASE64_KEY: ${{ (inputs.server == '195' && secrets.SERVER_195_KEY) || (inputs.server == '26' && secrets.SERVER_26_KEY) || secrets.SERVER_27_KEY }}
+  INFRA_DIR: ${{ vars.INFRA_BASE_PATH }}
 
 jobs:
   deploy-rabbitmq:
-    if: ${{ fromJSON(github.event.inputs.deploy_rabbitmq) }}
+    if: ${{ inputs.deploy_rabbitmq == true }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,7 +69,7 @@ jobs:
               '
 
   deploy-redis:
-    if: ${{ fromJSON(github.event.inputs.deploy_redis) }}
+    if: ${{ inputs.deploy_redis == true }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
