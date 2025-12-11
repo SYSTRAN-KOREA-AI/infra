@@ -71,7 +71,7 @@ jobs:
               
               echo "[DEPLOY] Creating .env"
               cat > rabbitmq/.env << 'EOF'
-              '$ENV'
+              $ENV
               EOF
 
               echo "[DEPLOY] Apply RabbitMQ compose"
