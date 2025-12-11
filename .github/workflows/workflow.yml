@@ -22,17 +22,17 @@ on:
         default: false
 
 env:
-  PREFIX_HOST: ${{
+  SERVER_HOST: ${{
     (github.event.inputs.server == '195' && secrets.SERVER_195_HOST) ||
     (github.event.inputs.server == '26'  && secrets.SERVER_26_HOST)  ||
     secrets.SERVER_27_HOST
   }}
-  PREFIX_PORT: ${{
+  SERVER_PORT: ${{
     (github.event.inputs.server == '195' && secrets.SERVER_195_PORT) ||
     (github.event.inputs.server == '26'  && secrets.SERVER_26_PORT)  ||
     secrets.SERVER_27_PORT
   }}
-  PREFIX_USER: ${{
+  SERVER_USER: ${{
     (github.event.inputs.server == '195' && secrets.SERVER_195_USER) ||
     (github.event.inputs.server == '26'  && secrets.SERVER_26_USER)  ||
     secrets.SERVER_27_USER
@@ -51,28 +51,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # prefix 제거
-      - name: Normalize host
-        id: host
-        run: |
-          RAW="${{ env.PREFIX_HOST }}"
-          HOST="${RAW#systran-}"
-          echo "host=$HOST" >> "$GITHUB_OUTPUT"
-
-      - name: Normalize port
-        id: port
-        run: |
-          RAW="${{ env.PREFIX_PORT }}"
-          PORT="${RAW#systran-}"
-          echo "port=$PORT" >> "$GITHUB_OUTPUT"
-
-      - name: Normalize user
-        id: user
-        run: |
-          RAW="${{ env.PREFIX_USER }}"
-          USER="${RAW#systran-}"
-          echo "user=$USER" >> "$GITHUB_OUTPUT"
-
       # 프라이빗 키 준비
       - name: Prepare SSH key
         run: |
@@ -81,21 +59,25 @@ jobs:
 
       - name: Deploy infra (RabbitMQ)
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key -p "${{ steps.port.outputs.port }}" \
-            "${{ steps.user.outputs.user }}@${{ steps.host.outputs.host }}" '
+          HOST="${{ env.SERVER_HOST }}"
+          PORT="${{ env.SERVER_PORT }}"
+          USER="${{ env.SERVER_USER }}"
+          INFRA="${{ env.INFRA_DIR }}"
+          
+          ssh -o StrictHostKeyChecking=no -i private_key -p "$PORT" "$USER@$HOST" '
               set -e
           
-              echo "[INFO] Using INFRA_DIR: ${{ env.INFRA_DIR }}"
+              echo "[INFO] INFRA_DIR='$INFRA'"
           
               echo "[DEPLOY] Update infra repo"
-              if [ ! -d "${{ env.INFRA_DIR }}/.git" ]; then
-                git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "${{ env.INFRA_DIR }}"
+              if [ ! -d "'$INFRA'/.git" ]; then
+                git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
               else
-                cd "${{ env.INFRA_DIR }}" && git pull origin main
+                cd "'$INFRA'" && git pull origin main
               fi
 
               echo "[DEPLOY] Apply RabbitMQ compose"
-              cd "${{ env.INFRA_DIR }}"/rabbitmq
+              cd "'$INFRA'/rabbitmq"
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
@@ -108,28 +90,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # prefix 제거
-      - name: Normalize host
-        id: host
-        run: |
-          RAW="${{ env.PREFIX_HOST }}"
-          HOST="${RAW#systran-}"
-          echo "host=$HOST" >> "$GITHUB_OUTPUT"
-
-      - name: Normalize port
-        id: port
-        run: |
-          RAW="${{ env.PREFIX_PORT }}"
-          PORT="${RAW#systran-}"
-          echo "port=$PORT" >> "$GITHUB_OUTPUT"
-
-      - name: Normalize user
-        id: user
-        run: |
-          RAW="${{ env.PREFIX_USER }}"
-          USER="${RAW#systran-}"
-          echo "user=$USER" >> "$GITHUB_OUTPUT"
-
       # 프라이빗 키 준비
       - name: Prepare SSH key
         run: |
@@ -138,21 +98,25 @@ jobs:
 
       - name: Deploy infra (Redis)
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key -p "${{ steps.port.outputs.port }}" \
-            "${{ steps.user.outputs.user }}@${{ steps.host.outputs.host }}" '
+          HOST="${{ env.SERVER_HOST }}"
+          PORT="${{ env.SERVER_PORT }}"
+          USER="${{ env.SERVER_USER }}"
+          INFRA="${{ env.INFRA_DIR }}"
+          
+          ssh -o StrictHostKeyChecking=no -i private_key -p "$PORT" "$USER@$HOST" '
               set -e
-
-              echo "[INFO] Using INFRA_DIR: ${{ env.INFRA_DIR }}"
-
+          
+              echo "[INFO] INFRA_DIR='$INFRA'"
+          
               echo "[DEPLOY] Update infra repo"
-              if [ ! -d "${{ env.INFRA_DIR }}/.git" ]; then
-                git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "${{ env.INFRA_DIR }}"
+              if [ ! -d "'$INFRA'/.git" ]; then
+                git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
               else
-                cd "${{ env.INFRA_DIR }}" && git pull origin main
+                cd "'$INFRA'" && git pull origin main
               fi
 
               echo "[DEPLOY] Apply Redis compose"
-              cd "${{ env.INFRA_DIR }}"/redis
+              cd "'$INFRA'/redis"
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
