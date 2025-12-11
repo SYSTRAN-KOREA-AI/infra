@@ -120,9 +120,7 @@ jobs:
               fi
 
               echo "[DEPLOY] Creating .env"
-              cat > redis/.env << 'EOF'
-              $ENV
-              EOF
+              echo "'$ENV'" | sed 's/\r$//' > redis/.env
 
               echo "[DEPLOY] Apply Redis compose"
               cd redis
