@@ -26,6 +26,7 @@ env:
   SERVER_PORT: ${{ (inputs.server == '195' && secrets.SERVER_195_PORT) || (inputs.server == '26' && secrets.SERVER_26_PORT) || secrets.SERVER_27_PORT }}
   SERVER_USER: ${{ (inputs.server == '195' && secrets.SERVER_195_USER) || (inputs.server == '26' && secrets.SERVER_26_USER) || secrets.SERVER_27_USER }}
   BASE64_KEY: ${{ (inputs.server == '195' && secrets.SERVER_195_KEY) || (inputs.server == '26' && secrets.SERVER_26_KEY) || secrets.SERVER_27_KEY }}
+  PROFILE: ${{ (inputs.server == '27' && 'dev') || (inputs.server == '26' && 'stage') || (inputs.server == '195' && 'prod') }}
   INFRA_DIR: ${{ vars.INFRA_BASE_PATH }}
 
 jobs:
@@ -47,6 +48,10 @@ jobs:
           PORT="${{ env.SERVER_PORT }}"
           USER="${{ env.SERVER_USER }}"
           INFRA="${{ env.INFRA_DIR }}"
+          PROFILE="${{ env.PROFILE }}"
+          ENV_DEV="${{ secrets.ENV_DEV }}"
+          ENV_STAGE="${{ secrets.ENV_STAGE }}"
+          ENV_PROD="${{ secrets.ENV_PROD }}"
           
           ssh -o StrictHostKeyChecking=no -i private_key -p "$PORT" "$USER@$HOST" '
               set -e
@@ -57,17 +62,24 @@ jobs:
               if [ ! -d "'$INFRA'/.git" ]; then
                 rm -rf '$INFRA'
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
+                echo "[DEPLOY] Sync infra repo with origin/main using robust fetch/reset"
+              else
+                echo "[DEPLOY] Sync infra repo with origin/main using robust fetch/reset"
+                cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
+                git remote prune origin
+                git fetch --all
+                git reset --hard origin/main 
+                git clean -fd
               fi
-          
-              cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
-              git remote prune origin
-              git fetch --all
-              git reset --hard origin/main 
-              git clean -fd
+              
+              echo "[DEPLOY] Creating .env files based on profile: '$PROFILE'"
+              echo "'$ENV_DEV'" > "'$INFRA'/.env.dev"
+              echo "'$ENV_STAGE'" > "'$INFRA'/.env.stage"
+              echo "'$ENV_PROD'" > "'$INFRA'/.env.prod"
 
               echo "[DEPLOY] Apply RabbitMQ compose"
               cd rabbitmq
-              docker compose up -d --build
+              docker compose --env-file ../.env.$PROFILE up -d --build
 
               echo "[CLEANUP] remove unused images"
               docker image prune -f || true
@@ -91,27 +103,38 @@ jobs:
           PORT="${{ env.SERVER_PORT }}"
           USER="${{ env.SERVER_USER }}"
           INFRA="${{ env.INFRA_DIR }}"
-          
+          PROFILE="${{ env.PROFILE }}"
+          ENV_DEV="${{ secrets.ENV_DEV }}"
+          ENV_STAGE="${{ secrets.ENV_STAGE }}"
+          ENV_PROD="${{ secrets.ENV_PROD }}"
+
           ssh -o StrictHostKeyChecking=no -i private_key -p "$PORT" "$USER@$HOST" '
               set -e
-          
+
               echo "[INFO] INFRA_DIR='$INFRA'"
-          
+
+              echo "[DEPLOY] Update infra repo"
               if [ ! -d "'$INFRA'/.git" ]; then
                 rm -rf '$INFRA'
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
+                cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
               else
-                echo '[DEPLOY] Sync infra repo with origin/main'
-                cd '$INFRA'
-                git remote prune origin || true
+                echo "[DEPLOY] Sync infra repo with origin/main using robust fetch/reset"
+                cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
+                git remote prune origin
                 git fetch --all
-                git reset --hard origin/main
+                git reset --hard origin/main 
                 git clean -fd
               fi
-          
+
+              echo "[DEPLOY] Creating .env files based on profile: '$PROFILE'"
+              echo "'$ENV_DEV'" > "'$INFRA'/.env.dev"
+              echo "'$ENV_STAGE'" > "'$INFRA'/.env.stage"
+              echo "'$ENV_PROD'" > "'$INFRA'/.env.prod"
+
               echo "[DEPLOY] Apply Redis compose"
-              cd '$INFRA/redis'
-              docker compose up -d --build
+              cd redis
+              docker compose --env-file ../.env.$PROFILE up -d --build
 
               echo "[CLEANUP] remove unused images"
               docker image prune -f || true
