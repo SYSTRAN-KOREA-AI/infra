@@ -70,9 +70,7 @@ jobs:
               fi
               
               echo "[DEPLOY] Creating .env"
-              cat > rabbitmq/.env << 'EOF'
-              $ENV
-              EOF
+              printf "%s" "'$ENV'" > rabbitmq/.env
 
               echo "[DEPLOY] Apply RabbitMQ compose"
               cd rabbitmq
@@ -123,7 +121,7 @@ jobs:
 
               echo "[DEPLOY] Creating .env"
               cat > redis/.env << 'EOF'
-              '$ENV'
+              $ENV
               EOF
 
               echo "[DEPLOY] Apply Redis compose"
