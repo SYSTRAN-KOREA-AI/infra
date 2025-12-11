@@ -26,7 +26,7 @@ env:
   SERVER_PORT: ${{ (inputs.server == '195' && secrets.SERVER_195_PORT) || (inputs.server == '26' && secrets.SERVER_26_PORT) || secrets.SERVER_27_PORT }}
   SERVER_USER: ${{ (inputs.server == '195' && secrets.SERVER_195_USER) || (inputs.server == '26' && secrets.SERVER_26_USER) || secrets.SERVER_27_USER }}
   BASE64_KEY: ${{ (inputs.server == '195' && secrets.SERVER_195_KEY) || (inputs.server == '26' && secrets.SERVER_26_KEY) || secrets.SERVER_27_KEY }}
-  PROFILE: ${{ (inputs.server == '27' && 'dev') || (inputs.server == '26' && 'stage') || (inputs.server == '195' && 'prod') }}
+  DOCKER_ENV: ${{ (inputs.server == '27' && secrets.ENV_DEV) || (inputs.server == '26' && secrets.ENV_STAGE) || (inputs.server == '195' && secrets.ENV_PROD) }}
   INFRA_DIR: ${{ vars.INFRA_BASE_PATH }}
 
 jobs:
@@ -48,10 +48,7 @@ jobs:
           PORT="${{ env.SERVER_PORT }}"
           USER="${{ env.SERVER_USER }}"
           INFRA="${{ env.INFRA_DIR }}"
-          PROFILE="${{ env.PROFILE }}"
-          ENV_DEV="${{ secrets.ENV_DEV }}"
-          ENV_STAGE="${{ secrets.ENV_STAGE }}"
-          ENV_PROD="${{ secrets.ENV_PROD }}"
+          ENV="${{ env.DOCKER_ENV }}"
           
           ssh -o StrictHostKeyChecking=no -i private_key -p "$PORT" "$USER@$HOST" '
               set -e
@@ -72,14 +69,12 @@ jobs:
                 git clean -fd
               fi
               
-              echo "[DEPLOY] Creating .env files based on profile: '$PROFILE'"
-              echo "'$ENV_DEV'" > "'$INFRA'/.env.dev"
-              echo "'$ENV_STAGE'" > "'$INFRA'/.env.stage"
-              echo "'$ENV_PROD'" > "'$INFRA'/.env.prod"
+              echo "[DEPLOY] Creating .env"
+              echo "'$ENV'" > rabbitmq/.env
 
               echo "[DEPLOY] Apply RabbitMQ compose"
               cd rabbitmq
-              "docker compose --env-file ../.env.'$PROFILE' up -d --build"
+              docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
               docker image prune -f || true
@@ -103,10 +98,7 @@ jobs:
           PORT="${{ env.SERVER_PORT }}"
           USER="${{ env.SERVER_USER }}"
           INFRA="${{ env.INFRA_DIR }}"
-          PROFILE="${{ env.PROFILE }}"
-          ENV_DEV="${{ secrets.ENV_DEV }}"
-          ENV_STAGE="${{ secrets.ENV_STAGE }}"
-          ENV_PROD="${{ secrets.ENV_PROD }}"
+          ENV="${{ env.DOCKER_ENV }}"
 
           ssh -o StrictHostKeyChecking=no -i private_key -p "$PORT" "$USER@$HOST" '
               set -e
@@ -127,14 +119,12 @@ jobs:
                 git clean -fd
               fi
 
-              echo "[DEPLOY] Creating .env files based on profile: '$PROFILE'"
-              echo "'$ENV_DEV'" > "'$INFRA'/.env.dev"
-              echo "'$ENV_STAGE'" > "'$INFRA'/.env.stage"
-              echo "'$ENV_PROD'" > "'$INFRA'/.env.prod"
+              echo "[DEPLOY] Creating .env"
+              echo "'$ENV'" > redis/.env
 
               echo "[DEPLOY] Apply Redis compose"
               cd redis
-              "docker compose --env-file ../.env.'$PROFILE' up -d --build"
+              docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
               docker image prune -f || true
