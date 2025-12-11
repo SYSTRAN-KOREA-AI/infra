@@ -60,7 +60,8 @@ jobs:
               fi
           
               cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
-              git fetch origin main
+              git remote prune origin
+              git fetch --all
               git reset --hard origin/main 
               git clean -fd
 
@@ -99,15 +100,17 @@ jobs:
               if [ ! -d "'$INFRA'/.git" ]; then
                 rm -rf '$INFRA'
                 git clone https://github.com/SYSTRAN-KOREA-AI/infra.git "'$INFRA'"
+              else
+                echo '[DEPLOY] Sync infra repo with origin/main'
+                cd '$INFRA'
+                git remote prune origin || true
+                git fetch --all
+                git reset --hard origin/main
+                git clean -fd
               fi
           
-              cd "'$INFRA'" || { echo "Failed to cd into $INFRA"; exit 1; }
-              git fetch origin main
-              git reset --hard origin/main 
-              git clean -fd
-
               echo "[DEPLOY] Apply Redis compose"
-              cd redis
+              cd '$INFRA/rabbitmq'
               docker compose up -d --build
 
               echo "[CLEANUP] remove unused images"
