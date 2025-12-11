@@ -31,7 +31,7 @@ env:
 
 jobs:
   deploy-rabbitmq:
-    if: ${{ github.event.inputs.deploy_rabbitmq }}
+    if: ${{ fromJSON(github.event.inputs.deploy_rabbitmq) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
               '
 
   deploy-redis:
-    if: ${{ github.event.inputs.deploy_redis }}
+    if: ${{ fromJSON(github.event.inputs.deploy_redis) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
