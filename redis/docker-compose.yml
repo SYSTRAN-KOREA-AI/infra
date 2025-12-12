@@ -1,8 +1,13 @@
+x-common-environment: &common-environment
+  REDIS_PASSWORD: ${REDIS_PASSWORD}
+
 services:
   # Redis Master
   redis-master:
     build: ./master
     container_name: redis-master
+    environment:
+      <<: *common-environment
     volumes:
       - redis-master-data:/data
     networks:
@@ -16,6 +21,8 @@ services:
     container_name: redis-replica1
     depends_on:
       - redis-master
+    environment:
+      <<: *common-environment
     volumes:
       - redis-replica1-data:/data
     networks:
@@ -27,6 +34,8 @@ services:
     container_name: redis-replica2
     depends_on:
       - redis-master
+    environment:
+      <<: *common-environment
     volumes:
       - redis-replica2-data:/data
     networks:
@@ -40,6 +49,8 @@ services:
       - redis-master
       - redis-replica1
       - redis-replica2
+    environment:
+      <<: *common-environment
     networks:
       - infra-network
     ports:
@@ -53,6 +64,8 @@ services:
       - redis-master
       - redis-replica1
       - redis-replica2
+    environment:
+      <<: *common-environment
     networks:
       - infra-network
 
@@ -64,6 +77,8 @@ services:
       - redis-master
       - redis-replica1
       - redis-replica2
+    environment:
+      <<: *common-environment
     networks:
       - infra-network
 
