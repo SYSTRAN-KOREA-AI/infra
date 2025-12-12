@@ -1,5 +1,5 @@
 port 6379
-requirepass
+requirepass ${REDIS_PASSWORD}
 protected-mode yes
 
 maxmemory 16mb

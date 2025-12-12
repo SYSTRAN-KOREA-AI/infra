@@ -1,8 +1,8 @@
 port 6379
 replicaof redis-master 6379
 
-masterauth
-requirepass
+masterauth ${REDIS_PASSWORD}
+requirepass ${REDIS_PASSWORD}
 protected-mode yes
 
 maxmemory 16mb

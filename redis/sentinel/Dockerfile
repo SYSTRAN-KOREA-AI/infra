@@ -1,5 +1,10 @@
 FROM redis:7.2
 
-COPY sentinel.conf /usr/local/etc/redis/sentinel.conf
+RUN apt-get update \
+ && apt-get install -y gettext-base \
+ && rm -rf /var/lib/apt/lists/*
 
-CMD ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+COPY sentinel.conf.template /usr/local/etc/redis/sentinel.conf.template
+
+CMD sh -c "envsubst < /usr/local/etc/redis/sentinel.conf.template > /usr/local/etc/redis/sentinel.conf \
+ && redis-sentinel /usr/local/etc/redis/sentinel.conf"
