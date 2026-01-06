@@ -6,7 +6,17 @@
       "pattern": "^translations-user.*",
       "apply-to": "queues",
       "definition": {
-        "expires": 3600001
+        "expires": 21600000
+      },
+      "priority": 0
+    },
+    {
+      "vhost": "/",
+      "name": "kickout-queues-auto-expire",
+      "pattern": "^kick-out.*",
+      "apply-to": "queues",
+      "definition": {
+        "expires": 21600000
       },
       "priority": 0
     }
