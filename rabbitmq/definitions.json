@@ -19,6 +19,26 @@
         "expires": 21600000
       },
       "priority": 0
+    },
+    {
+      "vhost": "/",
+      "name": "user-queues-auto-expire",
+      "pattern": "^session-info.*",
+      "apply-to": "queues",
+      "definition": {
+        "expires": 21600000
+      },
+      "priority": 0
+    },
+    {
+      "vhost": "/",
+      "name": "user-queues-auto-expire",
+      "pattern": "^tts-audio.*",
+      "apply-to": "queues",
+      "definition": {
+        "expires": 21600000
+      },
+      "priority": 0
     }
   ]
 }
