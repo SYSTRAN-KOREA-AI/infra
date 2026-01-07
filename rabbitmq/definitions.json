@@ -2,42 +2,34 @@
   "policies": [
     {
       "vhost": "/",
-      "name": "user-queues-auto-expire",
+      "name": "queue-expires-6h-translations-user",
       "pattern": "^translations-user.*",
       "apply-to": "queues",
-      "definition": {
-        "expires": 21600000
-      },
+      "definition": { "expires": 21600000 },
       "priority": 0
     },
     {
       "vhost": "/",
-      "name": "kickout-queues-auto-expire",
-      "pattern": "^kick-out.*",
-      "apply-to": "queues",
-      "definition": {
-        "expires": 21600000
-      },
-      "priority": 0
-    },
-    {
-      "vhost": "/",
-      "name": "user-queues-auto-expire",
+      "name": "queue-expires-6h-session-info",
       "pattern": "^session-info.*",
       "apply-to": "queues",
-      "definition": {
-        "expires": 21600000
-      },
+      "definition": { "expires": 21600000 },
       "priority": 0
     },
     {
       "vhost": "/",
-      "name": "user-queues-auto-expire",
+      "name": "queue-expires-6h-tts-audio",
       "pattern": "^tts-audio.*",
       "apply-to": "queues",
-      "definition": {
-        "expires": 21600000
-      },
+      "definition": { "expires": 21600000 },
+      "priority": 0
+    },
+    {
+      "vhost": "/",
+      "name": "queue-expires-6h-kick-out",
+      "pattern": "^kick-out.*",
+      "apply-to": "queues",
+      "definition": { "expires": 21600000 },
       "priority": 0
     }
   ]

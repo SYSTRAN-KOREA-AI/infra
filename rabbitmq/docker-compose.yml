@@ -12,6 +12,8 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     networks:
       - infra-network
     healthcheck:
