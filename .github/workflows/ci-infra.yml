@@ -75,6 +75,29 @@ jobs:
               echo "[DEPLOY] Apply RabbitMQ compose"
               cd rabbitmq
               docker compose up -d --build
+          
+              echo "[WAIT] rabbitmq starting..."
+              # RabbitMQ가 뜰 때까지 최대 60초 대기
+              for i in $(seq 1 60); do
+                if docker exec infra-rabbitmq rabbitmqctl status >/dev/null 2>&1; then
+                  echo "[OK] rabbitmq is ready"
+                  break
+                fi
+                sleep 1
+              done
+              
+              # 여전히 준비 안 됐으면 실패 처리
+              docker exec infra-rabbitmq rabbitmqctl status >/dev/null 2>&1 || {
+                echo "[ERROR] rabbitmq not ready"
+                docker logs --tail 200 infra-rabbitmq || true
+                exit 1
+              }
+              
+              echo "[APPLY] import definitions"
+              docker exec infra-rabbitmq rabbitmqctl import_definitions /etc/rabbitmq/definitions.json
+              
+              echo "[VERIFY] show policies"
+              docker exec infra-rabbitmq rabbitmqctl list_policies -p / || true
 
               echo "[CLEANUP] remove unused images"
               docker image prune -f || true
